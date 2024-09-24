@@ -5,6 +5,7 @@ __pycache__/
 *.bag
 # C extensions
 *.so
+bags
 
 # Distribution / packaging
 .Python
