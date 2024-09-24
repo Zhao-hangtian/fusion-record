@@ -4,6 +4,7 @@ import subprocess
 import os
 import multiprocessing
 from datetime import datetime
+from run_devices_monitor import devices
 
 app = Flask(__name__)
 
@@ -15,38 +16,11 @@ logging.basicConfig(level=logging.INFO,
                         logging.StreamHandler()
                     ])
 
-# 预期设备信息
-devices = {
-    "d455": {
-        "topics": [
-            "/d455/infra1/image_rect_raw",
-            "/d455/infra2/image_rect_raw",
-            "/d455/depth/image_rect_raw"
-        ],
-        "ros_master_uri": "http://127.0.0.1:11311"
-    },
-    "t265": {
-        "topics": [
-            "/t265/fisheye1/image_raw",
-            "/t265/fisheye2/image_raw"
-        ],
-        "ros_master_uri": "http://127.0.0.1:11311"
-    },
-    "device4": {
-        "topics": [
-            "/fisheye/bleft/image_raw/compressed",
-            "/fisheye/bright/image_raw/compressed",
-            "/fisheye/left/image_raw/compressed",
-            "/fisheye/right/image_raw/compressed"
-        ],
-        "ros_master_uri": "http://10.42.0.2:11311"
-    }
-}
-
 # 录制函数
 def record_bag(device_name, topics, ros_master_uri):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    bag_filename = f"{device_name}_{timestamp}.bag"  # 以设备名称命名 bag 文件
+    folder = 'tmp'
+    bag_filename = f"{folder}/{device_name}_{timestamp}.bag"  # 以设备名称命名 bag 文件
     topic_string = ' '.join(topics)
 
     # 设置独立的环境变量
@@ -69,7 +43,7 @@ def record():
     # 启动多个进程录制 bag 文件
     processes = []
     for device_name, device_info in devices.items():
-        p = multiprocessing.Process(target=record_bag, args=(device_name, device_info['topics'], device_info['ros_master_uri']))
+        p = multiprocessing.Process(target=record_bag, args=(device_name, device_info['topics'], device_info.get('ros_master_uri', 'http://127.0.0.1:11311') ))
         p.start()
         processes.append(p)
         logging.info(f"启动设备 {device_name} 的录制进程，ROS_MASTER_URI: {device_info.get('ros_master_uri', 'http://10.42.0.2:11311')}")
