@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO,
 # 录制函数
 def record_bag(device_name, topics, ros_master_uri):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    folder = 'tmp'
+    folder = 'bags'
     bag_filename = f"{folder}/{device_name}_{timestamp}.bag"  # 以设备名称命名 bag 文件
     topic_string = ' '.join(topics)
 
